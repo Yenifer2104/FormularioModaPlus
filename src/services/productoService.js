@@ -1,16 +1,17 @@
-
 const fs = require('fs');
 const path = require('path');
 
-// Carpeta de almacenamiento persistente
+// Crear la carpeta data si no existe
 const carpetaDatos = process.env.DATA_DIR || path.join(__dirname, '../data');
 
-fs.mkdirSync(carpetaDatos, { recursive: true });
+if (!fs.existsSync(carpetaDatos)) {
+    fs.mkdirSync(carpetaDatos, { recursive: true });
+}
 
-// Archivo de productos
+// Ubicación del archivo JSON
 const archivo = path.join(carpetaDatos, 'productos.json');
 
-// Crear archivo si no existe
+// Crear el archivo si no existe
 if (!fs.existsSync(archivo)) {
     fs.writeFileSync(archivo, '[]');
 }
