@@ -1,0 +1,612 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModaPlus - Tienda de ropa</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+    <!-- INICIO DE SESIÓN -->
+    <section id="login" class="panel login">
+        <h1 class="logo">Moda<span>Plus</span> ♡</h1>
+        <p>Tienda de ropa</p>
+        <h2>Iniciar sesión</h2>
+
+        <input id="correoLogin" type="email" placeholder="Correo electrónico">
+        <input id="contrasena" type="password" placeholder="Contraseña">
+
+        <button class="guardar" onclick="iniciarSesion()">Ingresar</button>
+        <p id="mensaje"></p>
+
+        <p>¿No tienes una cuenta?
+            <a href="#" onclick="mostrarRegistro(); return false;">Regístrate aquí</a>
+        </p>
+    </section>
+
+    <!-- REGISTRO DE USUARIOS -->
+    <section id="registro" class="panel login oculto">
+        <h1 class="logo">Moda<span>Plus</span> ♡</h1>
+        <p>Tienda de ropa</p>
+        <h2>Crear cuenta</h2>
+
+        <input id="nombreRegistro" placeholder="Nombre completo">
+        <input id="correoRegistro" type="email" placeholder="Correo electrónico">
+        <input id="contrasenaRegistro" type="password" placeholder="Contraseña (mínimo 6 caracteres)">
+
+        <button class="guardar" onclick="registrarUsuario()">Registrarme</button>
+        <p id="mensajeRegistro"></p>
+
+        <p>¿Ya tienes una cuenta?
+            <a href="#" onclick="mostrarLogin(); return false;">Inicia sesión</a>
+        </p>
+    </section>
+
+    <!-- SISTEMA MODAPLUS -->
+    <div id="aplicacion" class="oculto">
+
+        <header>
+            <div>
+                <div class="logo">Moda<span>Plus</span> ♡</div>
+                <p>Tienda de ropa | Administración de productos</p>
+            </div>
+            <strong id="nombreUsuario"></strong>
+        </header>
+
+        <main>
+
+            <!-- FORMULARIO -->
+            <section class="panel">
+
+                <div class="titulo">
+                    <h2>👕 Registrar Producto</h2>
+                    <p>Completa la información del producto de ropa.</p>
+                </div>
+
+                <form id="formulario">
+
+                    <div class="form-grid">
+
+                        <div>
+                            <label for="id">ID del producto</label>
+                            <input id="id" placeholder="Automático" disabled>
+                        </div>
+
+                        <div>
+                            <label for="marca">Marca *</label>
+                            <input id="marca" placeholder="Ej. Nike" required>
+                        </div>
+
+                        <div>
+                            <label for="nombre">Nombre del producto *</label>
+                            <input id="nombre" placeholder="Ej. Camiseta básica" required>
+                        </div>
+
+                        <div>
+                            <label for="precio">Precio (COP) *</label>
+                            <input id="precio" type="number" min="1" placeholder="Ej. 35000" required>
+                        </div>
+
+                        <div>
+                            <label for="categoria">Categoría *</label>
+                            <select id="categoria" required>
+                                <option value="">Seleccionar categoría</option>
+                                <option>Camisetas</option>
+                                <option>Pantalones</option>
+                                <option>Vestidos</option>
+                                <option>Chaquetas</option>
+                                <option>Buzos</option>
+                                <option>Faldas</option>
+                                <option>Accesorios</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="descripcion">Descripción *</label>
+                            <textarea id="descripcion" placeholder="Describe el producto..." required></textarea>
+                        </div>
+
+                        <div>
+                            <label for="talla">Talla *</label>
+                            <select id="talla" required>
+                                <option value="">Seleccionar talla</option>
+                                <option>XS</option>
+                                <option>S</option>
+                                <option>M</option>
+                                <option>L</option>
+                                <option>XL</option>
+                                <option>XXL</option>
+                                <option>32</option>
+                                <option>34</option>
+                                <option>36</option>
+                                <option>38</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="botones">
+                        <button class="guardar" type="submit" id="btnGuardar">💾 Guardar</button>
+                        <button class="actualizar" type="button" onclick="actualizarSeleccionado()">✏️ Actualizar</button>
+                        <button class="eliminar" type="button" onclick="eliminarSeleccionado()">🗑️ Eliminar</button>
+                        <button class="limpiar" type="button" onclick="limpiarFormulario()">Limpiar</button>
+                    </div>
+
+                </form>
+            </section>
+
+            <!-- LISTA DE PRODUCTOS -->
+            <section class="panel">
+
+                <div class="lista-titulo">☷ Lista de Productos</div>
+
+                <input
+                    id="busqueda"
+                    class="busqueda"
+                    placeholder="🔍 Buscar por nombre, categoría, talla o marca..."
+                    oninput="cargarProductos()"
+                >
+
+                <div class="tabla-contenedor">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre del producto</th>
+                                <th>Categoría</th>
+                                <th>Talla</th>
+                                <th>Marca</th>
+                                <th>Precio (COP)</th>
+                                <th>Descripción</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tablaProductos"></tbody>
+                    </table>
+                </div>
+
+                <p id="total">Mostrando 0 productos</p>
+
+                <button class="limpiar" onclick="cerrarSesion()">Cerrar sesión</button>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- VENTANA PARA CONFIRMAR ELIMINACIÓN -->
+    <div id="modalEliminar" class="modal-fondo oculto">
+        <div class="modal-contenido">
+            <div class="icono-modal">🗑️</div>
+            <h2>¿Eliminar producto?</h2>
+            <p>Esta acción no se puede deshacer.</p>
+
+            <div class="modal-botones">
+                <button class="limpiar" onclick="cerrarModal()">Cancelar</button>
+                <button class="eliminar" onclick="confirmarEliminacion()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIONES -->
+    <div id="notificacion" class="notificacion oculto">
+        <div id="iconoNotificacion" class="icono-notificacion">✓</div>
+
+        <div>
+            <h3 id="tituloNotificacion">¡Correcto!</h3>
+            <p id="textoNotificacion"></p>
+        </div>
+
+        <button type="button" onclick="cerrarNotificacion()">×</button>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+
+        let token = '';
+        let idEditar = null;
+        let productoPendienteEliminar = null;
+        let temporizadorNotificacion;
+
+        // MOSTRAR NOTIFICACIÓN
+        function mostrarNotificacion(titulo, texto, tipo = 'exito') {
+
+            const aviso = document.getElementById('notificacion');
+            const icono = document.getElementById('iconoNotificacion');
+
+            document.getElementById('tituloNotificacion').textContent = titulo;
+            document.getElementById('textoNotificacion').textContent = texto;
+
+            aviso.classList.remove('oculto', 'error-notificacion');
+
+            if (tipo === 'error') {
+                aviso.classList.add('error-notificacion');
+                icono.textContent = '!';
+            } else {
+                icono.textContent = '✓';
+            }
+
+            clearTimeout(temporizadorNotificacion);
+
+            temporizadorNotificacion = setTimeout(() => {
+                cerrarNotificacion();
+            }, 3500);
+        }
+
+        function cerrarNotificacion() {
+            document.getElementById('notificacion').classList.add('oculto');
+        }
+
+        // VENTANA DE ELIMINACIÓN
+        function abrirModal(id) {
+            productoPendienteEliminar = id;
+            document.getElementById('modalEliminar').classList.remove('oculto');
+        }
+
+        function cerrarModal() {
+            productoPendienteEliminar = null;
+            document.getElementById('modalEliminar').classList.add('oculto');
+        }
+
+        async function confirmarEliminacion() {
+
+            if (productoPendienteEliminar === null) return;
+
+            const id = productoPendienteEliminar;
+            cerrarModal();
+
+            await ejecutarEliminacion(id);
+        }
+
+        // MOSTRAR REGISTRO
+        function mostrarRegistro() {
+            document.getElementById('login').classList.add('oculto');
+            document.getElementById('registro').classList.remove('oculto');
+        }
+
+        // MOSTRAR LOGIN
+        function mostrarLogin() {
+            document.getElementById('registro').classList.add('oculto');
+            document.getElementById('login').classList.remove('oculto');
+        }
+
+        // REGISTRAR USUARIO
+        async function registrarUsuario() {
+
+            const nombre = document.getElementById('nombreRegistro').value.trim();
+            const correo = document.getElementById('correoRegistro').value.trim();
+            const contrasena = document.getElementById('contrasenaRegistro').value;
+
+            const mensaje = document.getElementById('mensajeRegistro');
+
+            if (!nombre || !correo || !contrasena) {
+                mensaje.textContent = 'Completa todos los campos.';
+                return;
+            }
+
+            try {
+                const respuesta = await fetch('/api/auth/registro', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nombre, correo, contrasena })
+                });
+
+                const datos = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    mensaje.textContent = datos.mensaje;
+                    return;
+                }
+
+                document.getElementById('nombreRegistro').value = '';
+                document.getElementById('correoRegistro').value = '';
+                document.getElementById('contrasenaRegistro').value = '';
+
+                document.getElementById('correoLogin').value = correo;
+
+                mostrarLogin();
+
+                document.getElementById('mensaje').textContent =
+                    'Cuenta creada correctamente. Ahora inicia sesión.';
+
+            } catch (error) {
+                mensaje.textContent = 'No se pudo conectar con el servidor.';
+            }
+        }
+
+        // INICIAR SESIÓN
+        async function iniciarSesion() {
+
+            try {
+                const respuesta = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        correo: document.getElementById('correoLogin').value.trim(),
+                        contrasena: document.getElementById('contrasena').value
+                    })
+                });
+
+                const datos = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    document.getElementById('mensaje').textContent = datos.mensaje;
+                    return;
+                }
+
+                token = datos.token;
+
+                document.getElementById('nombreUsuario').textContent =
+                    datos.usuario.nombre;
+
+                document.getElementById('login').classList.add('oculto');
+                document.getElementById('registro').classList.add('oculto');
+                document.getElementById('aplicacion').classList.remove('oculto');
+
+                document.getElementById('mensaje').textContent = '';
+
+                cargarProductos();
+
+            } catch (error) {
+                mostrarNotificacion('Error', 'No se pudo conectar con el servidor.', 'error');
+            }
+        }
+
+        // ESCAPAR HTML
+        function escaparHTML(texto) {
+            return String(texto ?? '').replace(/[&<>"']/g, caracter => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[caracter]);
+        }
+
+        // CONSULTAR PRODUCTOS
+        async function cargarProductos() {
+
+            try {
+                const respuesta = await fetch('/api/productos');
+                const productos = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    mostrarNotificacion('Error', 'No se pudieron cargar los productos.', 'error');
+                    return;
+                }
+
+                const filtro = document.getElementById('busqueda').value.toLowerCase();
+
+                const filtrados = productos.filter(p =>
+                    [p.id, p.nombre, p.categoria, p.talla, p.marca]
+                        .join(' ').toLowerCase().includes(filtro)
+                );
+
+                document.getElementById('total').textContent =
+                    'Mostrando ' + filtrados.length + ' de ' + productos.length + ' productos';
+
+                document.getElementById('tablaProductos').innerHTML =
+                    filtrados.map(p => `
+                        <tr>
+                            <td>${escaparHTML(p.id)}</td>
+                            <td>${escaparHTML(p.nombre)}</td>
+                            <td>${escaparHTML(p.categoria)}</td>
+                            <td>${escaparHTML(p.talla)}</td>
+                            <td>${escaparHTML(p.marca)}</td>
+                            <td>$ ${Number(p.precio).toLocaleString('es-CO')}</td>
+                            <td>${escaparHTML(p.descripcion)}</td>
+                            <td>
+                                <button class="editar" onclick="editarProducto(${Number(p.id)})">✏️</button>
+                                <button class="eliminar" onclick="eliminarProducto(${Number(p.id)})">🗑️</button>
+                            </td>
+                        </tr>
+                    `).join('');
+
+            } catch (error) {
+                mostrarNotificacion('Error', 'Error al consultar los productos.', 'error');
+            }
+        }
+
+        // REGISTRAR PRODUCTO
+        document.getElementById('formulario').addEventListener('submit', async e => {
+
+            e.preventDefault();
+
+            if (idEditar !== null) {
+                mostrarNotificacion('Atención', 'Estás editando un producto. Pulsa Actualizar.', 'error');
+                return;
+            }
+
+            const producto = obtenerDatosFormulario();
+
+            try {
+                const respuesta = await fetch('/api/productos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(producto)
+                });
+
+                const datos = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    mostrarNotificacion('No se pudo registrar', datos.mensaje, 'error');
+                    return;
+                }
+
+                mostrarNotificacion('¡Producto registrado!', 'El producto se guardó correctamente.');
+
+                limpiarFormulario();
+                cargarProductos();
+
+            } catch (error) {
+                mostrarNotificacion('Error', 'No se pudo registrar el producto.', 'error');
+            }
+        });
+
+        // OBTENER DATOS DEL FORMULARIO
+        function obtenerDatosFormulario() {
+            return {
+                nombre: document.getElementById('nombre').value.trim(),
+                categoria: document.getElementById('categoria').value,
+                talla: document.getElementById('talla').value,
+                marca: document.getElementById('marca').value.trim(),
+                precio: document.getElementById('precio').value,
+                descripcion: document.getElementById('descripcion').value.trim()
+            };
+        }
+
+        // EDITAR PRODUCTO
+        async function editarProducto(id) {
+
+            try {
+                const respuesta = await fetch('/api/productos/' + id);
+                const p = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    mostrarNotificacion('Error', p.mensaje, 'error');
+                    return;
+                }
+
+                document.getElementById('id').value = p.id;
+                document.getElementById('nombre').value = p.nombre;
+                document.getElementById('categoria').value = p.categoria;
+                document.getElementById('talla').value = p.talla;
+                document.getElementById('marca').value = p.marca;
+                document.getElementById('precio').value = p.precio;
+                document.getElementById('descripcion').value = p.descripcion;
+
+                idEditar = id;
+
+                document.getElementById('btnGuardar').textContent = '💾 Guardar cambios';
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (error) {
+                mostrarNotificacion('Error', 'No se pudo consultar el producto.', 'error');
+            }
+        }
+
+        // ACTUALIZAR PRODUCTO
+        async function actualizarSeleccionado() {
+
+            if (idEditar === null) {
+                mostrarNotificacion('Atención', 'Primero selecciona un producto con el botón de editar.', 'error');
+                return;
+            }
+
+            if (!document.getElementById('formulario').reportValidity()) return;
+
+            const producto = obtenerDatosFormulario();
+
+            try {
+                const respuesta = await fetch('/api/productos/' + idEditar, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(producto)
+                });
+
+                const datos = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    mostrarNotificacion('No se pudo actualizar', datos.mensaje, 'error');
+                    return;
+                }
+
+                mostrarNotificacion('¡Producto actualizado!', 'Los cambios se guardaron correctamente.');
+
+                limpiarFormulario();
+                cargarProductos();
+
+            } catch (error) {
+                mostrarNotificacion('Error', 'No se pudo actualizar el producto.', 'error');
+            }
+        }
+
+        // SOLICITAR ELIMINACIÓN
+        async function eliminarProducto(id) {
+            abrirModal(id);
+        }
+
+        // EJECUTAR ELIMINACIÓN
+        async function ejecutarEliminacion(id) {
+
+            try {
+                const respuesta = await fetch('/api/productos/' + id, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                const datos = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    mostrarNotificacion('No se pudo eliminar', datos.mensaje, 'error');
+                    return;
+                }
+
+                if (idEditar === id) {
+                    limpiarFormulario();
+                }
+
+                mostrarNotificacion('¡Producto eliminado!', 'El producto fue eliminado correctamente.');
+
+                cargarProductos();
+
+            } catch (error) {
+                mostrarNotificacion('Error', 'No se pudo eliminar el producto.', 'error');
+            }
+        }
+
+        // ELIMINAR PRODUCTO SELECCIONADO
+        async function eliminarSeleccionado() {
+
+            if (idEditar === null) {
+                mostrarNotificacion('Atención', 'Primero selecciona un producto con el botón de editar.', 'error');
+                return;
+            }
+
+            abrirModal(idEditar);
+        }
+
+        // LIMPIAR FORMULARIO
+        function limpiarFormulario() {
+            document.getElementById('formulario').reset();
+            document.getElementById('id').value = '';
+            document.getElementById('btnGuardar').textContent = '💾 Guardar';
+            idEditar = null;
+        }
+
+        // CERRAR SESIÓN
+        function cerrarSesion() {
+
+            token = '';
+            limpiarFormulario();
+
+            document.getElementById('aplicacion').classList.add('oculto');
+            document.getElementById('login').classList.remove('oculto');
+
+            document.getElementById('correoLogin').value = '';
+            document.getElementById('contrasena').value = '';
+            document.getElementById('mensaje').textContent = '';
+            document.getElementById('nombreUsuario').textContent = '';
+        }
+
+    </script>
+
+</body>
+</html>
